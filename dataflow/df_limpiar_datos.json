@@ -15,8 +15,26 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sql_silver_llamadas_tigo",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "cast1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          descripcion as string,",
@@ -30,7 +48,35 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> source1"
+				"     format: 'table') ~> source1",
+				"source1 derive(fecha = trim(fecha),",
+				"          hora = trim(hora)) ~> derivedColumn1",
+				"derivedColumn1 filter(!isNull(numero_origen)) ~> filter1",
+				"filter1 cast(output(",
+				"          fecha as date 'dd/MM/yyyy',",
+				"          hora as timestamp 'HH:mm:ss',",
+				"          duracion as integer",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          tipo as string,",
+				"          numero_origen as string,",
+				"          numero_destino as string,",
+				"          fecha as date,",
+				"          hora as timestamp,",
+				"          duracion as integer,",
+				"          costo as decimal(18,0)",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
