@@ -56,7 +56,16 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          descripcion = DESCRIPCION,",
+				"          tipo = TIPO,",
+				"          numero_origen = NUMERO_ORIGEN,",
+				"          numero_destino = NUMERO_DESTINO,",
+				"          fecha = FECHA,",
+				"          hora = HORA,",
+				"          duracion = DURACION",
+				"     )) ~> sink1"
 			]
 		}
 	}
